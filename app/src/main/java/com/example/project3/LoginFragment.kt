@@ -17,6 +17,8 @@ import com.example.project3.databinding.FragmentLoginBinding
 import com.example.project3.uiComponents.ProgressButton
 import com.example.project3.viewModels.LoginFragmentViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 
 /**
@@ -44,6 +46,8 @@ class LoginFragment : Fragment() {
         binding = FragmentLoginBinding.inflate(inflater, container, false)
         // Inflate the layout for this fragment
 
+
+        checkUser()
         gButton = binding.animatedButton
         gButton.changeText = "please wait.."
         gButton.setPadding(30, 10, 30, 10)
@@ -89,8 +93,14 @@ class LoginFragment : Fragment() {
         return binding.root
     }
 
+    private fun checkUser() {
+        val user = Firebase.auth.currentUser
+        if(user!=null)
+            findNavController().navigate(R.id.action_loginFragment_to_areaFragment)
+    }
+
     private val compLogin = object : Completion {
-        override fun onComplete() {
+        override fun onComplete(url: String) {
             findNavController().navigate(R.id.action_loginFragment_to_areaFragment)
         }
 
@@ -100,7 +110,7 @@ class LoginFragment : Fragment() {
     }
 
     private val comp2 = object : Completion {
-        override fun onComplete() {
+        override fun onComplete(url: String) {
             findNavController().navigate(R.id.action_loginFragment_to_areaFragment)
         }
 

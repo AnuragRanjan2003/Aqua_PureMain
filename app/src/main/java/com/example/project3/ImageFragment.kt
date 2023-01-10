@@ -12,15 +12,17 @@ import android.util.Log.e
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.project3.constants.Constants.FILE_NAME
 import com.example.project3.constants.Constants.authority
 import com.example.project3.databinding.FragmentImageBinding
+import com.example.project3.uiComponents.ProgressButton
 import com.example.project3.viewModels.ImageFragmentViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
@@ -42,6 +44,7 @@ class ImageFragment : Fragment() {
 
     private var uri: Uri? = null
     private lateinit var pbtn: View
+    private lateinit var progressButton: ProgressButton
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,9 +59,20 @@ class ImageFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentImageBinding.inflate(inflater, container, false)
         Glide.with(this).load(R.drawable.image_placeholder).into(binding.imageView)
-
-
         pbtn = binding.root.findViewById(R.id.analyze_btn)
+        val icon = requireActivity().resources.getDrawable(R.drawable.google_logo, null)
+        progressButton = ProgressButton(
+            text = "Analyze",
+            changeText = "Analyzing..",
+            icon = icon,
+            iconEnabled = false,
+            view = pbtn
+        )
+
+        viewModel.setUI(binding, activity as AppCompatActivity, progressButton)
+
+
+
 
         binding.cameraBtn.setOnClickListener {
             askToOpenCamera()
@@ -68,10 +82,45 @@ class ImageFragment : Fragment() {
             openGallery()
         }
 
-        viewModel.observeUri().observe(viewLifecycleOwner){ e("uri",it.toString())}
+        viewModel.observeUri().observe(viewLifecycleOwner) {
+            uri = it
+            e("uri", it.toString())
+            if (it != null)
+                Glide.with(this)
+                    .load(it)
+                    .into(binding.imageView)
+        }
+
+        pbtn.setOnClickListener {
+            progressButton.activate()
+            if (uri == null) {
+                Snackbar.make(binding.root, "No image selected", Snackbar.LENGTH_SHORT).show()
+                progressButton.deactivate()
+            } else {
+                viewModel.saveImage(comp)
+            }
+        }
+
+        viewModel.getImageUrl().observe(viewLifecycleOwner) { e("url", "$it") }
+
+
 
 
         return binding.root
+    }
+
+    private val comp = object : Completion {
+        override fun onComplete(url: String) {
+            progressButton.deactivate()
+            val action = ImageFragmentDirections.actionImageFragmentToAnalysisFragment(url)
+            findNavController().navigate(action)
+            e(tag, "Done")
+        }
+
+        override fun onCancelled(name: String, message: String) {
+            progressButton.deactivate()
+            e(tag, "failed : $message")
+        }
     }
 
     companion object {
@@ -119,7 +168,7 @@ class ImageFragment : Fragment() {
 
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
 
-        startActivityForResult(intent,100)
+        startActivityForResult(intent, 100)
     }
 
     private fun getPhotoFile(fileName: String): File {
@@ -128,11 +177,10 @@ class ImageFragment : Fragment() {
     }
 
 
-
     fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
-        startActivityForResult(intent,101)
+        startActivityForResult(intent, 101)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

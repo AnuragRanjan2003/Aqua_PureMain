@@ -64,7 +64,7 @@ class SignUpFragment : Fragment() {
     }
 
     private val comp = object : Completion {
-        override fun onComplete() {
+        override fun onComplete(url: String) {
             findNavController().navigate(R.id.action_signUpFragment_to_areaFragment)
         }
 

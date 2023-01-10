@@ -3,7 +3,6 @@ package com.example.project3.uiComponents
 import android.animation.LayoutTransition
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.Icon
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.view.View
@@ -11,14 +10,13 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.graphics.drawable.IconCompat
 import com.example.project3.Completion
 import com.example.project3.R
 
 class ProgressButton(
     text: String,
     changeText: String,
-    icon: Drawable ,
+    icon: Drawable,
     view: View,
     iconEnabled: Boolean = true,
     textColor: Int = Color.WHITE,

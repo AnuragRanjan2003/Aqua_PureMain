@@ -10,4 +10,11 @@ object Constants {
     val userRef = Firebase.firestore.collection("users")
     const val FILE_NAME = "photo.jpg"
     const val authority = "com.example.fileprovider2"
+    const val GET_URl = "check.json"
+    const val BASE_URL = "https://api.sightengine.com/1.0/"
+    const val API_USER = "432909989"
+    const val API_SECRET = "ygsuZ7ipGQuyDrYFLAqU"
+    const val ALGAE_LIMIT = 0.00f
+    const val DIRT_LIMIT = 0.00f
+    const val API_MODEL= "properties"
 }

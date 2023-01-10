@@ -6,18 +6,12 @@ import android.webkit.MimeTypeMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.project3.Completion
 import com.example.project3.databinding.FragmentImageBinding
 import com.example.project3.uiComponents.ProgressButton
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -48,20 +42,20 @@ class ImageFragmentViewModel : ViewModel() {
         val ref = Firebase.storage.getReference(
             "posts/" + fuser.uid + "/" + getName() + "." + getFileExtension(uri.value!!)
         )
-        viewModelScope.launch(Dispatchers.IO) {
-            val x = async { ref.putFile(uri.value!!) }
-            val y = async { ref.downloadUrl.result }
-            withContext(Dispatchers.Main) {
-                val task = x.await()
-                if (task.isSuccessful) {
-                    url.value = y.await()
-                    comp.onComplete()
-                } else {
-                    comp.onCancelled("image",task.exception?.message.toString())
-                }
+        ref.putFile(uri.value!!)
+            .addOnSuccessListener {
+                ref.downloadUrl
+                    .addOnSuccessListener {
+                        url.value = it
+                        comp.onComplete(it.toString())
+                    }
+                    .addOnFailureListener {
+                        comp.onCancelled("data", it.message.toString())
+                    }
             }
-        }
-
+            .addOnFailureListener {
+                comp.onCancelled("data", it.message.toString())
+            }
     }
 
     private fun getFileExtension(uri: Uri): String? {

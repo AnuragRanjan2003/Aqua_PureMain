@@ -12,6 +12,7 @@
     <color name="placeholder">#DDDDDD</color>
     <color name="green">#4CAF50</color>
     <color name="text_blue">#1967d2</color>
+    <color name="light_blue">#e1f5fe</color>
     <color name="green_light">#eaf8f3</color>
     <color name="green_text">#80cfb2</color>
 </resources>

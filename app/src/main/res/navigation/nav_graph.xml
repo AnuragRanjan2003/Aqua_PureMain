@@ -32,5 +32,14 @@
         android:id="@+id/areaFragment"
         android:name="com.example.project3.AreaFragment"
         android:label="@string/area_fragment"
-        tools:layout="@layout/fragment_area" />
+        tools:layout="@layout/fragment_area" >
+        <action
+            android:id="@+id/action_areaFragment_to_imageFragment"
+            app:destination="@id/imageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/imageFragment"
+        android:name="com.example.project3.ImageFragment"
+        android:label="fragment_image"
+        tools:layout="@layout/fragment_image" />
 </navigation>

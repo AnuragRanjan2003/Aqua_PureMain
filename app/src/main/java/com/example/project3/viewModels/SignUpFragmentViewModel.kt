@@ -1,5 +1,6 @@
 package com.example.project3.viewModels
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.project3.Completion
@@ -33,9 +34,11 @@ class SignUpFragmentViewModel : ViewModel() {
         } else if (pass.value.isNullOrBlank()) {
             button.deactivate()
             binding.pass.error = "password needed"
+            return
         } else if (pass.value!!.length < 6) {
             button.deactivate()
             binding.pass.error = "6 chars needed"
+            return
         } else {
             Firebase.auth
                 .createUserWithEmailAndPassword(email.value!!, pass.value!!)
@@ -62,5 +65,9 @@ class SignUpFragmentViewModel : ViewModel() {
                 Snackbar.make(binding.root, it.message.toString(), Snackbar.LENGTH_SHORT).show()
                 comp.onCancelled("database", it.message.toString())
             }
+    }
+
+    fun getPass():LiveData<String>{
+        return pass
     }
 }

@@ -46,7 +46,7 @@ class LoginFragment : Fragment() {
 
         gButton = binding.animatedButton
         gButton.changeText = "please wait.."
-        gButton.setPadding(30,10,30,10)
+        gButton.setPadding(30, 10, 30, 10)
         button = binding.root.findViewById(R.id.include)
         pBtn = ProgressButton(
             text = "Login",
@@ -55,13 +55,17 @@ class LoginFragment : Fragment() {
             view = button,
             icon = requireActivity().resources.getDrawable(R.drawable.google_logo, null)
         )
-        viewModel.setUi(binding,gButton,pBtn)
+        viewModel.setUi(binding, gButton, pBtn)
 
 
 
 
         binding.email.doAfterTextChanged { viewModel.email.value = it.toString() }
         binding.pass.doAfterTextChanged { viewModel.pass.value = it.toString() }
+
+        viewModel.getPass().observe(viewLifecycleOwner) {
+            passwordUI(it)
+        }
 
         button.setOnClickListener {
             pBtn.activate()
@@ -95,20 +99,48 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private val comp2 = object  : Completion{
+    private val comp2 = object : Completion {
         override fun onComplete() {
             findNavController().navigate(R.id.action_loginFragment_to_areaFragment)
         }
 
         override fun onCancelled(name: String, message: String) {
-            e(name,message)
+            e(name, message)
         }
     }
 
+
+    private fun passwordUI(it:String){
+        if (it.trim().length >= 6) {
+            binding.textInputLayout.counterTextColor =
+                requireActivity().resources.getColorStateList(R.color.green, null)
+            binding.textInputLayout.boxStrokeColor =
+                requireActivity().resources.getColor(R.color.primary_light, null)
+            binding.textInputLayout.hintTextColor =
+                requireActivity().resources.getColorStateList(R.color.primary_light,null)
+        } else {
+            binding.textInputLayout.counterTextColor =
+                requireActivity().resources.getColorStateList(
+                    com.google.android.material.R.color.design_default_color_error,
+                    null
+                )
+            binding.textInputLayout.boxStrokeColor = requireActivity().resources.getColor(
+                com.google.android.material.R.color.design_default_color_error,
+                null
+            )
+            binding.textInputLayout.hintTextColor =
+                requireActivity().resources.getColorStateList(
+                    com.google.android.material.R.color.design_default_color_error, null
+                )
+        }
+    }
+
+
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == 101 && resultCode == Activity.RESULT_OK && data!=null) {
+        if (requestCode == 101 && resultCode == Activity.RESULT_OK && data != null) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            viewModel.handleResult(task,activity as AppCompatActivity,comp2)
+            viewModel.handleResult(task, activity as AppCompatActivity, comp2)
         } else
             super.onActivityResult(requestCode, resultCode, data)
     }

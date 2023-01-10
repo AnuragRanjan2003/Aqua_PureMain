@@ -2,6 +2,7 @@ package com.example.project3.viewModels
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.animatediconbutton.AnimatedButton
@@ -49,7 +50,12 @@ class LoginFragmentViewModel() : ViewModel() {
             binding.pass.error = "Password required"
             progressButton.deactivate()
             return
-        } else {
+        }else if(pass.value!!.length<6){
+            progressButton.deactivate()
+            binding.pass.error = "too short"
+            return
+        }
+        else {
             Firebase.auth
                 .signInWithEmailAndPassword(email.value!!.trim(), pass.value!!.trim())
                 .addOnSuccessListener {
@@ -125,6 +131,9 @@ class LoginFragmentViewModel() : ViewModel() {
             }
 
 
+    }
+    fun getPass():LiveData<String>{
+        return pass
     }
 
 

@@ -46,6 +46,10 @@ class SignUpFragment : Fragment() {
         binding.email.doAfterTextChanged { viewModel.email.value = it.toString() }
         binding.pass.doAfterTextChanged { viewModel.pass.value = it.toString() }
 
+        viewModel.getPass().observe(viewLifecycleOwner){
+            passwordUI(it)
+        }
+
         button.setOnClickListener {
             viewModel.signUp(comp)
         }
@@ -68,6 +72,31 @@ class SignUpFragment : Fragment() {
             TODO("Not yet implemented")
         }
     }
+    private fun passwordUI(it:String){
+        if (it.trim().length >= 6) {
+            binding.textInputLayout.counterTextColor =
+                requireActivity().resources.getColorStateList(R.color.green, null)
+            binding.textInputLayout.boxStrokeColor =
+                requireActivity().resources.getColor(R.color.primary_light, null)
+            binding.textInputLayout.hintTextColor =
+                requireActivity().resources.getColorStateList(R.color.primary_light,null)
+        } else {
+            binding.textInputLayout.counterTextColor =
+                requireActivity().resources.getColorStateList(
+                    com.google.android.material.R.color.design_default_color_error,
+                    null
+                )
+            binding.textInputLayout.boxStrokeColor = requireActivity().resources.getColor(
+                com.google.android.material.R.color.design_default_color_error,
+                null
+            )
+            binding.textInputLayout.hintTextColor =
+                requireActivity().resources.getColorStateList(
+                    com.google.android.material.R.color.design_default_color_error, null
+                )
+        }
+    }
+
 
 
 }

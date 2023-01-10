@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.project3.databinding.FragmentAreaBinding
 import com.example.project3.viewModels.ApplicationViewModel
 
@@ -41,6 +42,9 @@ class AreaFragment : Fragment() {
         prepLocationUpdates()
         appViewModel.startLocationUpdates()
         appViewModel.getLocationLiveData().observe(viewLifecycleOwner){ e("loc","$it")}
+        binding.fab.setOnClickListener {
+            findNavController().navigate(R.id.action_areaFragment_to_imageFragment)
+        }
         return binding.root
     }
 

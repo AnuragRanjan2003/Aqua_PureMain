@@ -3,11 +3,15 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="on_primary_light">#FFFFFFFF</color>
-    <color name="primary_light">#12c4ea</color>
+    <color name="primary_light">#1bd7e9</color>
     <color name="light_blue_600">#FF039BE5</color>
     <color name="light_blue_900">#FF01579B</color>
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
     <color name="placeholder">#DDDDDD</color>
+    <color name="green">#4CAF50</color>
+    <color name="text_blue">#1967d2</color>
+    <color name="green_light">#eaf8f3</color>
+    <color name="green_text">#80cfb2</color>
 </resources>

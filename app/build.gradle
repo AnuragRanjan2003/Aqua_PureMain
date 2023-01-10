@@ -101,5 +101,7 @@ dependencies {
     implementation 'com.airbnb.android:lottie:5.2.0'
     //Animated button
     implementation 'com.github.AnuragRanjan2003:AnimatedIconButton2:1.0.1-beta'
+    //Dexter
+    implementation 'com.karumi:dexter:6.2.3'
 
 }

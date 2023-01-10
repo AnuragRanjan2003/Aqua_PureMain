@@ -50,4 +50,7 @@
     <string name="signup_fragment">Sign Up</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="advice">
+        please make sure that the color of water is clearly visible and there are no foreign objects in the image for best results.
+    </string>
 </resources>

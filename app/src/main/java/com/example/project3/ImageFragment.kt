@@ -112,7 +112,7 @@ class ImageFragment : Fragment() {
     private val comp = object : Completion {
         override fun onComplete(url: String) {
             progressButton.deactivate()
-            val action = ImageFragmentDirections.actionImageFragmentToAnalysisFragment(url)
+            val action = ImageFragmentDirections.actionImageFragmentToAnalysisFragment(url,uri.toString())
             findNavController().navigate(action)
             e(tag, "Done")
         }

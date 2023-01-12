@@ -17,4 +17,9 @@ object Constants {
     const val ALGAE_LIMIT = 0.00f
     const val DIRT_LIMIT = 0.00f
     const val API_MODEL= "properties"
+    const val GOOD = 0.95
+    const val MID =0.9
+    const val OK = "drinkable"
+    const val RISKY = "risky"
+    const val BAD = "unfit"
 }

@@ -9,8 +9,11 @@ import android.provider.MediaStore
 import android.util.Log
 import com.example.project3.Completion
 import com.example.project3.constants.Constants
+import com.example.project3.databinding.FragmentLoginBinding
+import com.example.project3.databinding.FragmentSignUpBinding
 import com.example.project3.ml.ModelUnquant
 import com.example.project3.models.Quality
+import com.example.project3.models.User
 import com.example.project3.models.colorApimodels.Dominant
 import com.example.project3.models.colorApimodels.Response
 import com.example.project3.models.helpers.Formatters
@@ -18,6 +21,10 @@ import com.example.project3.models.interpolators.HuetoWL
 import com.example.project3.models.interpolators.ProcessColor
 import com.example.project3.models.interpolators.RgbtoHue
 import com.example.project3.models.processedInfo
+import com.example.project3.uiComponents.ProgressButton
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -27,7 +34,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 
 
 class Repository {
-    private val fuser = Firebase.auth.currentUser!!
+    private val fuser = Firebase.auth.currentUser
     private val formatter = Formatters()
     suspend fun getColor(
         url: String,
@@ -103,7 +110,7 @@ class Repository {
 
     fun saveImage(comp: Completion, uri: Uri, context: Context) {
         val ref = Firebase.storage.getReference(
-            "posts/" + fuser.uid + "/" + formatter.getName() + "." + formatter.getFileExtension(
+            "posts/" + fuser!!.uid + "/" + formatter.getName() + "." + formatter.getFileExtension(
                 uri,
                 context
             )
@@ -123,5 +130,55 @@ class Repository {
             }
     }
 
+    fun signIn(email:String,pass: String,binding: FragmentLoginBinding,progressButton: ProgressButton,comp: Completion){
+        Firebase.auth
+            .signInWithEmailAndPassword(email, pass)
+            .addOnSuccessListener {
+                comp.onComplete()
+                progressButton.deactivate()
+            }
+            .addOnFailureListener {
+                Snackbar.make(binding.root,it.message.toString(), Snackbar.LENGTH_LONG).show()
+                comp.onCancelled("login Error", it.message.toString())
+                progressButton.deactivate()
+            }
+    }
+
+     fun saveUserData(
+        fUser: FirebaseUser,
+        comp: Completion,
+        binding: FragmentLoginBinding
+    ) {
+        val user = User(fUser.email!!, fUser.uid)
+        Constants.userRef
+            .document(fUser.uid)
+            .set(user)
+            .addOnSuccessListener {
+                comp.onComplete()
+            }
+            .addOnFailureListener {
+                Snackbar.make(binding.root, it.message.toString(), Snackbar.LENGTH_LONG).show()
+                comp.onCancelled("database", it.message.toString())
+            }
+
+
+    }
+
+    fun authSaveUserData(it : AuthResult,comp: Completion,email:String,pass: String,button: ProgressButton,binding: FragmentSignUpBinding){
+            Constants.userRef
+                .document(it.user!!.uid)
+                .set(User(email, it.user!!.uid))
+                .addOnSuccessListener {
+                    button.deactivate()
+                    comp.onComplete()
+                }
+                .addOnFailureListener {
+                    button.deactivate()
+                    Snackbar.make(binding.root, it.message.toString(), Snackbar.LENGTH_SHORT).show()
+                    comp.onCancelled("database", it.message.toString())
+                }
+
+
+    }
 
 }

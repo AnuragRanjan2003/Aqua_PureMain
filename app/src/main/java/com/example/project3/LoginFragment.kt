@@ -10,12 +10,14 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.animatediconbutton.AnimatedButton
 import com.example.project3.databinding.FragmentLoginBinding
+import com.example.project3.repo.Repository
 import com.example.project3.uiComponents.ProgressButton
 import com.example.project3.viewModels.LoginFragmentViewModel
+import com.example.project3.viewModels.factories.LoginFactory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -29,7 +31,7 @@ import com.google.firebase.ktx.Firebase
 class LoginFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private lateinit var binding: FragmentLoginBinding
-    private val viewModel: LoginFragmentViewModel by viewModels()
+    private lateinit var viewModel: LoginFragmentViewModel
     private lateinit var gButton: AnimatedButton
     private lateinit var button: View
     private lateinit var pBtn: ProgressButton
@@ -45,7 +47,9 @@ class LoginFragment : Fragment() {
     ): View? {
         binding = FragmentLoginBinding.inflate(inflater, container, false)
         // Inflate the layout for this fragment
-
+        val repo = Repository()
+        val factory = LoginFactory(repo)
+        viewModel = ViewModelProvider(this, factory)[LoginFragmentViewModel::class.java]
 
         checkUser()
         gButton = binding.animatedButton
@@ -95,7 +99,7 @@ class LoginFragment : Fragment() {
 
     private fun checkUser() {
         val user = Firebase.auth.currentUser
-        if(user!=null)
+        if (user != null)
             findNavController().navigate(R.id.action_loginFragment_to_areaFragment)
     }
 
@@ -120,14 +124,14 @@ class LoginFragment : Fragment() {
     }
 
 
-    private fun passwordUI(it:String){
+    private fun passwordUI(it: String) {
         if (it.trim().length >= 6) {
             binding.textInputLayout.counterTextColor =
                 requireActivity().resources.getColorStateList(R.color.green, null)
             binding.textInputLayout.boxStrokeColor =
                 requireActivity().resources.getColor(R.color.primary_light, null)
             binding.textInputLayout.hintTextColor =
-                requireActivity().resources.getColorStateList(R.color.primary_light,null)
+                requireActivity().resources.getColorStateList(R.color.primary_light, null)
         } else {
             binding.textInputLayout.counterTextColor =
                 requireActivity().resources.getColorStateList(
@@ -144,7 +148,6 @@ class LoginFragment : Fragment() {
                 )
         }
     }
-
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

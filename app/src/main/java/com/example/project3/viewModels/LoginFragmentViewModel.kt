@@ -9,19 +9,18 @@ import com.example.animatediconbutton.AnimatedButton
 import com.example.project3.Completion
 import com.example.project3.constants.Constants
 import com.example.project3.databinding.FragmentLoginBinding
-import com.example.project3.models.User
+import com.example.project3.repo.Repository
 import com.example.project3.uiComponents.ProgressButton
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-class LoginFragmentViewModel() : ViewModel() {
+class LoginFragmentViewModel(private val repo: Repository) : ViewModel() {
     private val mAuth = Firebase.auth
     val email = MutableLiveData("")
     val pass = MutableLiveData("")
@@ -30,7 +29,8 @@ class LoginFragmentViewModel() : ViewModel() {
     private lateinit var progressButton: ProgressButton
 
     private val gso =
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(Constants.WebClientId)
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(Constants.WebClientId)
             .requestEmail().build()
 
 
@@ -49,23 +49,13 @@ class LoginFragmentViewModel() : ViewModel() {
             binding.pass.error = "Password required"
             progressButton.deactivate()
             return
-        }else if(pass.value!!.length<6){
+        } else if (pass.value!!.length < 6) {
             progressButton.deactivate()
             binding.pass.error = "too short"
             return
-        }
-        else {
-            Firebase.auth
-                .signInWithEmailAndPassword(email.value!!.trim(), pass.value!!.trim())
-                .addOnSuccessListener {
-                    comp.onComplete()
-                    progressButton.deactivate()
-                }
-                .addOnFailureListener {
-                    Snackbar.make(binding.root,it.message.toString(),Snackbar.LENGTH_LONG).show()
-                    comp.onCancelled("login Error", it.message.toString())
-                    progressButton.deactivate()
-                }
+        } else {
+            repo.signIn(email.value!!.trim(), pass.value!!.trim(), binding, progressButton, comp)
+
         }
     }
 
@@ -103,7 +93,7 @@ class LoginFragmentViewModel() : ViewModel() {
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
         mAuth.signInWithCredential(credential).addOnCompleteListener {
             if (it.isSuccessful)
-                saveUserData(it.result.user!!, activity, comp)
+                repo.saveUserData(it.result.user!!, comp, binding)
             else {
                 Snackbar.make(binding.root, it.exception?.message.toString(), Snackbar.LENGTH_LONG)
                     .show()
@@ -112,26 +102,8 @@ class LoginFragmentViewModel() : ViewModel() {
         }
     }
 
-    private fun saveUserData(
-        fUser: FirebaseUser,
-        activity: AppCompatActivity,
-        comp: Completion
-    ) {
-        val user = User(fUser.email!!, fUser.uid)
-        Constants.userRef
-            .document(fUser.uid)
-            .set(user)
-            .addOnSuccessListener {
-                comp.onComplete()
-            }
-            .addOnFailureListener {
-                Snackbar.make(binding.root, it.message.toString(), Snackbar.LENGTH_LONG).show()
-                comp.onCancelled("database", it.message.toString())
-            }
 
-
-    }
-    fun getPass():LiveData<String>{
+    fun getPass(): LiveData<String> {
         return pass
     }
 

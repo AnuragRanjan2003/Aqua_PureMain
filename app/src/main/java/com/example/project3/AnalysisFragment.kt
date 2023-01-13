@@ -27,10 +27,7 @@ import com.example.project3.models.interpolators.ProcessColor
 import com.example.project3.repo.Repository
 import com.example.project3.uiComponents.ProgressButton
 import com.example.project3.viewModels.AnalysisFragmentViewModel
-import com.example.project3.viewModels.factories.AppViewModelFactory
-import java.math.RoundingMode
-import java.text.DecimalFormat
-import kotlin.math.floor
+import com.example.project3.viewModels.factories.AnalysisFactory
 
 
 class AnalysisFragment : Fragment() {
@@ -58,15 +55,19 @@ class AnalysisFragment : Fragment() {
 
         repo = Repository()
         formatter = Formatters()
-        val factory = AppViewModelFactory(requireActivity().application, repo)
+        val factory = AnalysisFactory(requireActivity().application, repo)
 
         viewModel = ViewModelProvider(
             this,
             factory
         )[AnalysisFragmentViewModel::class.java]
+
+        // ---------------logging the received args-----------//
         e(tag + "url", args.imageUrl)
         e(tag + "uri", args.imageUri)
         uri = Uri.parse(args.imageUri)
+        // ------------------------------------------------//
+
         viewModel.getResponse(args.imageUrl)
         viewModel.observeResponse().observe(viewLifecycleOwner) {
             e(tag, "response: $it")

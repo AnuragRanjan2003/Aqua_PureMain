@@ -7,15 +7,18 @@ import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.project3.databinding.FragmentSignUpBinding
+import com.example.project3.repo.Repository
 import com.example.project3.uiComponents.ProgressButton
 import com.example.project3.viewModels.SignUpFragmentViewModel
+import com.example.project3.viewModels.factories.SignUpFactory
 
 
 class SignUpFragment : Fragment() {
     private lateinit var binding: FragmentSignUpBinding
-    private val viewModel: SignUpFragmentViewModel by viewModels()
+    private lateinit var  viewModel: SignUpFragmentViewModel
     private lateinit var pBtn: ProgressButton
     private lateinit var button: View
     // TODO: Rename and change types of parameters
@@ -30,8 +33,11 @@ class SignUpFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = FragmentSignUpBinding.inflate(inflater, container, false)
 
+        binding = FragmentSignUpBinding.inflate(inflater, container, false)
+        val repo =Repository()
+        val factory = SignUpFactory(repo)
+        viewModel =ViewModelProvider(this,factory)[SignUpFragmentViewModel::class.java]
         button = binding.root.findViewById(R.id.include1)
         pBtn = ProgressButton(
             text = "Sign Up",

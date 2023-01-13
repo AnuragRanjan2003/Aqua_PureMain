@@ -41,6 +41,7 @@
                 android:layout_height="100dp"
                 android:visibility="gone"
                 android:scaleType="fitXY"
+                android:contentDescription="image of sample"
                 android:src="@drawable/wave"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -95,9 +96,8 @@
                 android:layout_height="wrap_content"
                 android:animateLayoutChanges="true"
                 android:background="#047CA5"
-                android:visibility="gone"
                 android:gravity="center_horizontal"
-                android:padding="10dp"
+                android:padding="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -106,6 +106,9 @@
                 <include
                     android:id="@+id/btn_report"
                     layout="@layout/report_button"
+                    android:visibility="gone"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
                     android:layout_width="270dp"
                     android:layout_height="wrap_content" />
             </LinearLayout>

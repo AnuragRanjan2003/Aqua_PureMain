@@ -25,4 +25,7 @@ class ProcessColor(color: Dominant) {
         return if (x == 0.00f) del
         else (del / x)
     }
+    fun getRgb():String{
+        return "(${color.r} ,${color.g} ,${color.b})"
+    }
 }

@@ -17,13 +17,16 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.project3.constants.Constants.FILE_NAME
 import com.example.project3.constants.Constants.authority
 import com.example.project3.databinding.FragmentImageBinding
+import com.example.project3.repo.Repository
 import com.example.project3.uiComponents.ProgressButton
 import com.example.project3.viewModels.ImageFragmentViewModel
+import com.example.project3.viewModels.factories.ImageFactory
 import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -37,9 +40,10 @@ import java.io.File
 class ImageFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private lateinit var binding: FragmentImageBinding
-    private val viewModel: ImageFragmentViewModel by activityViewModels()
+    private lateinit var  viewModel: ImageFragmentViewModel
 
     private lateinit var photoFile: File
+    private lateinit var repo : Repository
 
 
     private var uri: Uri? = null
@@ -57,6 +61,9 @@ class ImageFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        repo = Repository()
+        val factory = ImageFactory(repo)
+        viewModel = ViewModelProvider(this,factory)[ImageFragmentViewModel::class.java]
         binding = FragmentImageBinding.inflate(inflater, container, false)
         Glide.with(this).load(R.drawable.image_placeholder).into(binding.imageView)
         pbtn = binding.root.findViewById(R.id.analyze_btn)
@@ -69,7 +76,7 @@ class ImageFragment : Fragment() {
             view = pbtn
         )
 
-        viewModel.setUI(binding, activity as AppCompatActivity, progressButton)
+        viewModel.setUI(binding, activity as AppCompatActivity, progressButton,comp)
 
 
 
@@ -97,7 +104,7 @@ class ImageFragment : Fragment() {
                 Snackbar.make(binding.root, "No image selected", Snackbar.LENGTH_SHORT).show()
                 progressButton.deactivate()
             } else {
-                viewModel.saveImage(comp)
+                viewModel.saveImage()
             }
         }
 

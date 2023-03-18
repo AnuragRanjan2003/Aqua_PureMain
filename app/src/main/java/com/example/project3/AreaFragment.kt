@@ -84,7 +84,7 @@ class AreaFragment : Fragment() {
             LinearLayoutManager.VERTICAL
         )
         binding.areaRec.hasFixedSize()
-        adapter = AreaAdapter(list)
+        adapter = AreaAdapter(list, requireActivity().applicationContext)
         binding.areaRec.adapter = adapter
 
         return binding.root
@@ -146,7 +146,6 @@ class AreaFragment : Fragment() {
         })
 
 
-
     }
 
 
@@ -168,6 +167,7 @@ class AreaFragment : Fragment() {
             algae /= n
             dirty /= n
             sd /= n
+            Var = sd
             Var -= qualInd * qualInd
             Var = sqrt(Var / n)
             qualInd = (qualInd * 10000 / area)
@@ -178,7 +178,12 @@ class AreaFragment : Fragment() {
             val quality = Quality(qualInd.toFloat(), algae.toFloat(), dirty.toFloat())
             e("ind", "$qualInd")
             limit = 0.95 - 0.1554 * Var
+            e("limit","$limit")
+            e("var","$Var")
+            e("area","$area")
             putValues(quality)
+        }else{
+            putValues(Quality(0.00F,0.00F,0.00F))
         }
     }
 

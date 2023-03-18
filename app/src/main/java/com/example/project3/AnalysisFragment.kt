@@ -1,6 +1,7 @@
 package com.example.project3
 
 import android.animation.LayoutTransition
+import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log.e
@@ -20,6 +21,7 @@ import com.example.project3.constants.Constants.MID
 import com.example.project3.constants.Constants.OK
 import com.example.project3.constants.Constants.RISKY
 import com.example.project3.databinding.FragmentAnalysisBinding
+import com.example.project3.models.Report
 import com.example.project3.models.ValueModel
 import com.example.project3.models.colorApimodels.Response
 import com.example.project3.models.helpers.Formatters
@@ -28,6 +30,12 @@ import com.example.project3.repo.Repository
 import com.example.project3.uiComponents.ProgressButton
 import com.example.project3.viewModels.AnalysisFragmentViewModel
 import com.example.project3.viewModels.factories.AnalysisFactory
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class AnalysisFragment : Fragment() {
@@ -44,7 +52,11 @@ class AnalysisFragment : Fragment() {
     private lateinit var prog: ProgressButton
     private lateinit var btn: View
     private lateinit var repo: Repository
-    private lateinit var formatter : Formatters
+    private lateinit var formatter: Formatters
+    private var lat: Double = 0.00
+    private var lon: Double = 0.00
+    private var pred : Boolean = false
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -89,11 +101,38 @@ class AnalysisFragment : Fragment() {
         viewModel.getPrediction(activity as AppCompatActivity, uri)
         viewModel.observePrediction().observe(viewLifecycleOwner) {
             e("prediction", "${getStatus(it)}")
+            pred= when(getStatus(it)){
+                OK-> false
+                else -> true
+            }
+            adapter.addItem("quality",getStatus(it))
+
         }
         viewModel.startLocationUpdates()
-        viewModel.getLocationLiveData().observe(viewLifecycleOwner) { e("loc", "$it") }
+
+        viewModel.getLocationLiveData().observe(viewLifecycleOwner) {
+            e("loc", "$it")
+            lat = it.latitude.toDouble()
+            lon = it.longitude.toDouble()
+        }
 
         initView()
+
+
+        btn.setOnClickListener {
+            val report = Report(
+                algae,
+                date(),
+                dirty,
+                drinkable.toDouble(),
+                lat,
+                lon,
+                add(),
+                Firebase.auth.currentUser!!.uid
+            )
+            prog.activate()
+            viewModel.sendReport(report, comp1)
+        }
         return binding.root
     }
 
@@ -103,7 +142,7 @@ class AnalysisFragment : Fragment() {
         binding.imageView2.visibility = View.VISIBLE
         adapter.addItem("dominant color", ProcessColor(it.colors.dominant).getRgb())
         adapter.addItem("brightness", "${it.brightness * 100} %")
-        showButton(true)
+        showButton(pred)
     }
 
     private fun initView() {
@@ -145,5 +184,47 @@ class AnalysisFragment : Fragment() {
             else -> View.GONE
         }
     }
+
+    private fun add(): String {
+        val geocoder =
+            Geocoder((activity as AppCompatActivity).applicationContext, Locale.getDefault())
+        val sb = StringBuilder()
+        try {
+            val addressList = geocoder.getFromLocation(lat, lon, 1)
+
+            if (!addressList.isNullOrEmpty()) {
+                val address = addressList[0]
+
+                sb.append(address.subLocality + ", ")
+                sb.append(address.locality+", ")
+                sb.append(address.adminArea)
+
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            sb.append(Formatters().format(lat)).append(", "+Formatters().format(lon))
+        }
+        return sb.toString()
+    }
+
+    private fun date(): String {
+        val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val d = Calendar.getInstance().time
+        return format.format(d)
+    }
+
+    private val comp1 = object : Completion {
+        override fun onComplete(url: String) {
+            Snackbar.make(binding.root, "report submitted", Snackbar.LENGTH_SHORT).show()
+            prog.deactivate()
+            btn.visibility = View.GONE
+        }
+
+        override fun onCancelled(name: String, message: String) {
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+            prog.deactivate()
+        }
+    }
+
 
 }

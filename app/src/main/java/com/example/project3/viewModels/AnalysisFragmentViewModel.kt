@@ -12,21 +12,19 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.project3.Completion
 import com.example.project3.constants.Constants.ALGAE_LIMIT
 import com.example.project3.constants.Constants.API_MODEL
 import com.example.project3.constants.Constants.API_SECRET
 import com.example.project3.constants.Constants.API_USER
 import com.example.project3.constants.Constants.DIRT_LIMIT
 import com.example.project3.ml.ModelUnquant
-import com.example.project3.models.LocationLiveData
-import com.example.project3.models.Quality
-import com.example.project3.models.ValueModel
+import com.example.project3.models.*
 import com.example.project3.models.colorApimodels.Dominant
 import com.example.project3.models.colorApimodels.Response
 import com.example.project3.models.interpolators.HuetoWL
 import com.example.project3.models.interpolators.ProcessColor
 import com.example.project3.models.interpolators.RgbtoHue
-import com.example.project3.models.processedInfo
 import com.example.project3.repo.ApiInstance
 import com.example.project3.repo.Repository
 import kotlinx.coroutines.Dispatchers
@@ -65,11 +63,15 @@ class AnalysisFragmentViewModel(app: Application, repository: Repository) : Andr
         }
     }
 
+
+
     fun getPrediction(context: Context,uri: Uri){
         prediction.value = repo.getPrediction(context,uri)
     }
 
-
+    fun sendReport(report: Report,comp:Completion){
+        repo.report(report, comp)
+    }
 
 
 

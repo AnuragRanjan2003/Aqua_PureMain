@@ -1,5 +1,6 @@
 package com.example.project3.repo
 
+import android.content.AbstractThreadedSyncAdapter
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -8,11 +9,13 @@ import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import com.example.project3.Completion
+import com.example.project3.adapters.AreaAdapter
 import com.example.project3.constants.Constants
 import com.example.project3.databinding.FragmentLoginBinding
 import com.example.project3.databinding.FragmentSignUpBinding
 import com.example.project3.ml.ModelUnquant
 import com.example.project3.models.Quality
+import com.example.project3.models.Report
 import com.example.project3.models.User
 import com.example.project3.models.colorApimodels.Dominant
 import com.example.project3.models.colorApimodels.Response
@@ -26,11 +29,19 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class Repository {
@@ -180,5 +191,26 @@ class Repository {
 
 
     }
+
+    fun report(report : Report,comp: Completion){
+        val ref = Firebase.database.getReference("Reports")
+        val lat = Formatters().formatToName(report.lat)
+        val lon = Formatters().formatToName(report.lon)
+
+        ref
+            .child(lat)
+            .child(lon)
+            .child(report.uid+" "+dateTime())
+            .setValue(report)
+            .addOnSuccessListener { comp.onComplete("") }
+            .addOnFailureListener { comp.onCancelled("report",it.message.toString()) }
+    }
+
+    private fun dateTime():String {
+        val sf = SimpleDateFormat("dd MM yyyy HH:mm:ss", Locale.getDefault())
+        return sf.format(Date())
+    }
+
+
 
 }

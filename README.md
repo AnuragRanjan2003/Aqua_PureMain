@@ -3,7 +3,8 @@
   AquaPure is a cutting-edge Android application designed to provide users with a quick and reliable method of assessing the drinkability of water using machine learning (ML) models , APIs and other  algorithms. This app empowers users to make informed decisions about the water they consume by leveraging the power of technology and crowd-sourced data. Additionally, AquaPure offers access to recent reports of water assessments in nearby areas, enabling users to stay informed about the water quality around them.
 
 
-![1-merged](https://github.com/AnuragRanjan2003/MediConnect/assets/100191258/039e62e4-e2ba-4643-8781-b893d93953b8)
+![screenshot2-merged](https://github.com/AnuragRanjan2003/Aqua_PureMain/assets/100191258/f4f383ee-351b-4a04-97c9-31dc23357ab5)
+
 
 ## Key Features
    1. **Water Assessment :** Users can capture a photo of water using their device's camera within the app. AquaPure utilizes ML models ,APIS and algorithms to analyze the image, assessing various parameters to determine the drinkability of the water. The app considers factors such as color, turbidity, clarity, and presence of contaminants to provide an evaluation.

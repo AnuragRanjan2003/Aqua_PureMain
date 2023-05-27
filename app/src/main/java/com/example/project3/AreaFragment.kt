@@ -50,7 +50,8 @@ class AreaFragment : Fragment() {
     private var lon = "0"
     private var list = ArrayList<Report>()
     private val AREA_0 = 12391.88
-    private var limit = 0.00
+    private val limit = 0.60
+    private var avQuality = 0.00
     private var Var = 0.00
     // TODO: Rename and change types of parameters
 
@@ -59,8 +60,8 @@ class AreaFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentAreaBinding.inflate(inflater, container, false)
         // Inflate the layout for this fragment
+        binding = FragmentAreaBinding.inflate(inflater, container, false)
         appViewModel = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory(requireActivity().application)
@@ -137,15 +138,36 @@ class AreaFragment : Fragment() {
                         adapter.list,
                         lat.toDouble().toInt()
                     )
+                else {
+                    emptyUI()
+                }
 
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                emptyUI()
+                Toast.makeText(
+                    context,
+                    "error code ${error.code} :${error.message.toString()}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         })
 
 
+    }
+
+    private fun emptyUI() {
+        binding.cardBg.background =
+            requireActivity().resources.getDrawable(R.drawable.good_water_grad, null)
+        binding.cardPlaceholder.visibility = View.INVISIBLE
+        binding.mainCard.visibility = View.VISIBLE
+        try {
+            binding.index.text = String.format("%.2f", 1.00)
+        } catch (e: FormatException) {
+            e("formatting error", e.message.toString())
+        }
+        binding.cases.text = "0"
     }
 
 
@@ -169,7 +191,7 @@ class AreaFragment : Fragment() {
             sd /= n
             Var = sd
             Var -= qualInd * qualInd
-            Var = sqrt(Var / n)
+            Var = sqrt(Var /n)
             qualInd = (qualInd * 10000 / area)
             algae = (algae / area)
             dirty = (dirty / area)
@@ -177,18 +199,18 @@ class AreaFragment : Fragment() {
 
             val quality = Quality(qualInd.toFloat(), algae.toFloat(), dirty.toFloat())
             e("ind", "$qualInd")
-            limit = 0.95 - 0.1554 * Var
-            e("limit","$limit")
-            e("var","$Var")
-            e("area","$area")
+            avQuality = qualInd - 0.1554 * Var
+            e("avQuality", "$avQuality")
+            e("var", "$Var")
+            e("area", "$area")
             putValues(quality)
-        }else{
-            putValues(Quality(0.00F,0.00F,0.00F))
+        } else {
+            putValues(Quality(0.00F, 0.00F, 0.00F))
         }
     }
 
     private fun getStatus(quality: Quality): String {
-        return if (quality.qualInd!! / 10000 > limit) "Good"
+        return if (avQuality  > limit) "Good"
         else "Not Good"
 
     }

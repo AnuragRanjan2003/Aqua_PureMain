@@ -21,6 +21,7 @@ import com.example.project3.constants.Constants.MID
 import com.example.project3.constants.Constants.OK
 import com.example.project3.constants.Constants.RISKY
 import com.example.project3.databinding.FragmentAnalysisBinding
+import com.example.project3.databinding.FragmentAreaBinding
 import com.example.project3.models.Report
 import com.example.project3.models.ValueModel
 import com.example.project3.models.colorApimodels.Response

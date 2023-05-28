@@ -43,8 +43,8 @@
  4. MVVM
  5. Kotlin coroutines
  6. Firebase( Authentication, RealtimeDatabase , FirebaseStorage )
- 7. Location
- 8. Navigation
+ 7. GPS Location
+ 8. Navigation Components
 
   ###  Other Dependencies
  1. Glide - Easy Image Loading 
